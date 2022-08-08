@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { Message } from 'discord.js';
 import { GuildDatabaseManager } from '../database/Managers/GuildManager';
 import { InitDatabase } from '../database/Database';
+import MajoConfig, { IConfig } from './MajoConfig';
 
 dotenv.config();
 
@@ -52,6 +53,7 @@ export class MajoClient extends SapphireClient {
 	public override async login() {
 		const data = await InitDatabase.Init();
 		const manager = new GuildDatabaseManager();
+		new MajoConfig(this);
 
 		manager._init(data);
 		this.databases = { guilds: manager };
@@ -73,5 +75,6 @@ declare module '@sapphire/framework' {
 		databases: {
 			guilds: GuildDatabaseManager;
 		};
+		config: IConfig;
 	}
 }

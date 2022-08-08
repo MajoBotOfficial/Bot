@@ -16,8 +16,11 @@ export default class MajoConfig {
 	constructor(client: MajoClient) {
 		this.client = client;
 		this.config = defaultSettings;
+		this._init();
 	}
 	async _init() {
 		this.config = (await import('../../../settings.json')) ? await import('../../../settings.json') : defaultSettings;
+		this.client.config = this.config;
+		return this;
 	}
 }

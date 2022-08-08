@@ -1,6 +1,8 @@
 import { send } from '@sapphire/plugin-editable-commands';
 import { Message, MessageEmbed } from 'discord.js';
-import { resolveKey } from '@sapphire/plugin-i18next';
+import { fetchLanguage, LocalizedInteractionReplyOptions, resolveKey } from '@sapphire/plugin-i18next';
+import { Command, container } from '@sapphire/framework';
+import ChatInputInteraction = Command.ChatInputInteraction;
 
 /**
  * Picks a random item from an array
@@ -34,4 +36,20 @@ export function untilLength(arr: readonly string[], maxLength = 17, separator = 
 	}
 	if (returnArr.join(separator).length < arr.join(separator).length) return `${returnArr.join(separator)}, ...`;
 	return returnArr.join(separator);
+}
+
+export async function replyLocalized(interaction: ChatInputInteraction, options: LocalizedInteractionReplyOptions) {
+	if (interaction.replied || interaction.deferred) {
+		return await interaction.editReply({
+			content: container.i18n.format(await fetchLanguage(interaction), options.keys, {
+				replace: options.formatOptions
+			}) as string
+		});
+	}
+	return await interaction.reply({
+		content: container.i18n.format(await fetchLanguage(interaction), options.keys, {
+			replace: options.formatOptions
+		}) as string,
+		fetchReply: true
+	});
 }

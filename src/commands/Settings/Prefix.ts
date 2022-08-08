@@ -1,17 +1,19 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Message } from 'discord.js';
-import { SubCommandPluginCommand, SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
 import { Args } from '@sapphire/framework';
 import settings from '../../../settings.json';
+import { MajoSubCommand, MajoSubCommandOptions } from '../../lib/structures/MajoCommand';
+import { resolveKey } from '@sapphire/plugin-i18next';
 
-@ApplyOptions<SubCommandPluginCommandOptions>({
+@ApplyOptions<MajoSubCommandOptions>({
 	name: 'prefix',
 	description: 'View prefix or set one',
 	fullCategory: ['Settings'],
 	requiredUserPermissions: ['ADMINISTRATOR'],
-	subCommands: ['set', 'reset', { input: 'show', default: true }]
+	subCommands: ['set', 'reset', { input: 'show', default: true }],
+	examples: ['prefix set !', 'prefix reset']
 })
-export class UserCommand extends SubCommandPluginCommand {
+export class PrefixCommand extends MajoSubCommand {
 	public async show(message: Message) {
 		const guild = await this.container.client.databases.guilds.get(message.guildId as string);
 
@@ -19,15 +21,23 @@ export class UserCommand extends SubCommandPluginCommand {
 			embeds: [
 				{
 					color: 'GREEN',
-					description: `**The prefix of this guild is \`${guild.prefix}\`**`,
+					description: (await resolveKey(message, 'commands:prefix:show', {
+						formatOptions: {
+							prefix: guild.prefix
+						}
+					})) as string,
 					fields: [
 						{
-							name: 'How can i set a prefix?',
-							value: `${guild.prefix}prefix set [prefix]`
+							name: await resolveKey(message, 'commands:prefix:tips:set_name'),
+							value: await resolveKey(message, 'commands:prefix:tips:set_value', {
+								formatOptions: {
+									prefix: guild.prefix
+								}
+							})
 						}
 					],
 					timestamp: new Date(),
-					footer: { text: '©️ Copyright Majobot' }
+					footer: { text: '©️ Majobot' }
 				}
 			]
 		});
@@ -39,9 +49,11 @@ export class UserCommand extends SubCommandPluginCommand {
 			embeds: [
 				{
 					color: 'GREEN',
-					description: `**The prefix of this guild has been updated to \`${userPrefix[0]}\`**`,
+					description: (await resolveKey(message, 'commands:prefix:updated', {
+						formatOptions: { prefix: userPrefix[0] }
+					})) as string,
 					timestamp: new Date(),
-					footer: { text: '©️ Copyright Majobot' }
+					footer: { text: '©️ Majobot' }
 				}
 			]
 		});
@@ -52,9 +64,13 @@ export class UserCommand extends SubCommandPluginCommand {
 			embeds: [
 				{
 					color: 'GREEN',
-					description: `**The prefix of this guild has been updated to \`${settings.prefix}\`**`,
+					description: (await resolveKey(message, 'commands:prefix:reset', {
+						formatOptions: {
+							prefix: settings.prefix
+						}
+					})) as string,
 					timestamp: new Date(),
-					footer: { text: '©️ Copyright Majobot' }
+					footer: { text: '©️ Majobot' }
 				}
 			]
 		});

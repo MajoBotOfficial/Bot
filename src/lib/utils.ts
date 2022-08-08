@@ -1,6 +1,6 @@
 import { send } from '@sapphire/plugin-editable-commands';
 import { Message, MessageEmbed } from 'discord.js';
-import { RandomLoadingMessage } from './constants';
+import { resolveKey } from '@sapphire/plugin-i18next';
 
 /**
  * Picks a random item from an array
@@ -17,21 +17,21 @@ export function pickRandom<T>(array: readonly T[]): T {
  * Sends a loading message to the current channel
  * @param message The message data for which to send the loading message
  */
-export function sendLoadingMessage(message: Message): Promise<typeof message> {
-	return send(message, { embeds: [new MessageEmbed().setDescription(pickRandom(RandomLoadingMessage)).setColor('#FF0000')] });
+export async function sendLoadingMessage(message: Message): Promise<typeof message> {
+	const randomArr = [
+		await resolveKey(message, 'utils:constants:computing'),
+		await resolveKey(message, 'utils:constants:loading'),
+		await resolveKey(message, 'utils:constants:moment')
+	];
+	return send(message, { embeds: [new MessageEmbed().setDescription(pickRandom(randomArr)).setColor('#FF0000')] });
 }
 
-export function untilLength(
-	arr: readonly string[],
-	maxLength = 17,
-	separator = ", "
-): string {
+export function untilLength(arr: readonly string[], maxLength = 17, separator = ', '): string {
 	const returnArr: string[] = [];
 	for (let i = 0; returnArr.join(separator).length <= maxLength; i += 1) {
 		if (!arr[i]) break;
 		returnArr.push(arr[i] as string);
 	}
-	if (returnArr.join(separator).length < arr.join(separator).length)
-		return `${returnArr.join(separator)}, ...`;
+	if (returnArr.join(separator).length < arr.join(separator).length) return `${returnArr.join(separator)}, ...`;
 	return returnArr.join(separator);
 }

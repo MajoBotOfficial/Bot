@@ -29,7 +29,24 @@ export class MajoClient extends SapphireClient {
 				'DIRECT_MESSAGE_REACTIONS'
 			],
 			loadDefaultErrorListeners: false,
-			loadMessageCommandListeners: true
+			loadMessageCommandListeners: true,
+			i18n: {
+				fetchLanguage: async (context) => {
+					if (!context.guild) return 'english';
+					const settings = await this.databases.guilds.get(context.guild.id);
+
+					return settings.language;
+				}
+			},
+			presence: {
+				status: 'online',
+				activities: [
+					{
+						name: 'you',
+						type: 'WATCHING'
+					}
+				]
+			}
 		});
 	}
 	public override async login() {
@@ -40,13 +57,13 @@ export class MajoClient extends SapphireClient {
 		this.databases = { guilds: manager };
 		return super.login(process.env.TOKEN);
 	}
-	public override fetchPrefix = async (message: Message) => {
-		if (!message.guild) return [this.options.defaultPrefix, ''] as readonly string[];
+	public override fetchPrefix = async (message: Message): Promise<string[]> => {
+		if (!message.guild) return [this.options.defaultPrefix, ''] as string[];
 
 		const guild = await this.databases.guilds.get(message.guildId as string);
 
 		if (!guild) {
-			return [this.options.defaultPrefix, ''] as readonly string[];
+			return [this.options.defaultPrefix, ''] as string[];
 		}
 		return [guild.prefix, ''];
 	};

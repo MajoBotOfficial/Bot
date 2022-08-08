@@ -1,0 +1,9 @@
+{
+  "prefix": "!",
+  "owners": [],
+  "channels": {
+    "guild_create": "",
+    "guild_delete": "",
+    "error_log": ""
+  }
+}

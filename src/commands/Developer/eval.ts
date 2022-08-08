@@ -1,22 +1,23 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Args, Command, CommandOptions } from '@sapphire/framework';
+import { Args } from '@sapphire/framework';
 import { send } from '@sapphire/plugin-editable-commands';
 import { Type } from '@sapphire/type';
 import { codeBlock, isThenable } from '@sapphire/utilities';
 import type { Message } from 'discord.js';
 import { inspect } from 'util';
+import { MajoCommand, MajoCommandOptions } from '../../lib/structures/MajoCommand';
 
-@ApplyOptions<CommandOptions>({
+@ApplyOptions<MajoCommandOptions>({
 	aliases: ['ev'],
 	description: 'Evals any JavaScript code',
 	quotes: [],
 	preconditions: ['OwnerOnly' as any],
 	flags: ['async', 'hidden', 'showHidden', 'silent', 's'],
 	options: ['depth'],
-	fullCategory: ["Developer"]
+	fullCategory: ['Developer']
 })
-export class UserCommand extends Command {
-	public override async  messageRun(message: Message, args: Args) {
+export class UserCommand extends MajoCommand {
+	public override async messageRun(message: Message, args: Args) {
 		const code = await args.rest('string');
 
 		const { result, success, type } = await this.eval(message, code, {

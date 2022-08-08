@@ -12,4 +12,7 @@ export class GuildEntity {
 
 	@Column('string')
 	public prefix = settings.prefix;
+
+	@Column('string')
+	public language = 'english';
 }

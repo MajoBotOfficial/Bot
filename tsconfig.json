@@ -14,17 +14,6 @@
 		"outDir": "./dist",
 		"rootDir": ".",
 		"baseUrl": "./src",
-		"paths": {
-			"#utils/*": [
-				"lib/utils/*"
-			],
-			"#lib/*": [
-				"lib/*"
-			],
-			"#root/*": [
-				"*"
-			]
-		},
 		/* The "No" Corner */
 		"noImplicitAny": true,
 		"noImplicitOverride": true,

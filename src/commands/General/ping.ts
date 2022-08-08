@@ -1,21 +1,24 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Command, CommandOptions } from '@sapphire/framework';
-import { send } from '@sapphire/plugin-editable-commands';
 import type { Message } from 'discord.js';
+import { MajoCommand, MajoCommandOptions } from '../../lib/structures/MajoCommand';
+import { sendLocalized } from '@sapphire/plugin-i18next';
 
-@ApplyOptions<CommandOptions>({
+@ApplyOptions<MajoCommandOptions>({
 	name: 'ping',
 	description: 'ping pong',
 	fullCategory: ['General']
 })
-export class UserCommand extends Command {
+export class UserCommand extends MajoCommand {
 	public override async messageRun(message: Message) {
-		const msg = await send(message, 'Ping?');
+		const msg = await sendLocalized(message, 'commands:ping:ping');
 
-		const content = `Pong! Bot Latency ${Math.round(this.container.client.ws.ping)}ms. API Latency ${
-			(msg.editedTimestamp || msg.createdTimestamp) - (message.editedTimestamp || message.createdTimestamp)
-		}ms.`;
-
-		return send(message, content);
+		msg.delete();
+		return sendLocalized(message, {
+			keys: 'commands:ping:pong',
+			formatOptions: {
+				bot_latency: `${Math.round(this.container.client.ws.ping)}`,
+				api_latency: `${(msg.editedTimestamp || msg.createdTimestamp) - (message.editedTimestamp || message.createdTimestamp)}`
+			}
+		});
 	}
 }

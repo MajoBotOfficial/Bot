@@ -1,16 +1,19 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Args, Command, CommandOptions } from '@sapphire/framework';
+import { Args } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { MessageEmbed } from 'discord.js';
 import { sendLoadingMessage } from '../../lib/utils';
+import { MajoCommand, MajoCommandOptions } from '../../lib/structures/MajoCommand';
+import { MajoClient } from '../../lib/structures/MajoClient';
+import { resolveKey } from '@sapphire/plugin-i18next';
 
-@ApplyOptions<CommandOptions>({
+@ApplyOptions<MajoCommandOptions>({
 	name: 'help',
 	description: 'ping pong',
 	fullCategory: ['General']
 })
-export class UserCommand extends Command {
+export class HelpCommand extends MajoCommand {
 	public override async messageRun(message: Message, args: Args) {
 		const cmd = await args.pick('string').catch(() => null);
 		const response = await sendLoadingMessage(message);
@@ -23,7 +26,7 @@ export class UserCommand extends Command {
 				const cmds = [...this.container.stores.get('commands').values()].filter((cmd) => cmd.category === group).map((cmd) => cmd.name);
 				paginatedMessage.addPageEmbed(
 					new MessageEmbed()
-						.setTitle(group as string)
+						.setTitle(await resolveKey(message, `categories:${group as string}`))
 						.setDescription(`${cmds.join(', ')}`)
 						.setTimestamp()
 				);
@@ -32,33 +35,44 @@ export class UserCommand extends Command {
 			await paginatedMessage.run(response, message.author);
 			return response;
 		} else {
-			const command = this.container.client.stores.get('commands').get(cmd);
+			const command = this.container.client.stores.get('commands').get(cmd) as MajoCommand;
 			if (!command) {
 				return response.edit({
 					embeds: [
 						{
 							color: 'RED',
-							description: 'Command not found.'
+							description: (await resolveKey(message, 'commands:help:not_found')) as string
 						}
 					]
 				});
 			}
+			const examples = command.examples
+				? await Promise.all(
+						command.examples?.map(
+							async (cmd) => `\`${(await (this.container.client as MajoClient).fetchPrefix(message)).join('')}${cmd}\``
+						)
+				  )
+				: await resolveKey(message, 'commands:help:no_examples');
 			return response.edit({
 				embeds: [
 					{
 						title: command.name,
 						fields: [
 							{
-								name: 'Description',
-								value: command.description || 'No description.'
+								name: await resolveKey(message, 'commands:help:description'),
+								value: command.description || (await resolveKey(message, 'commands:help:no_description'))
 							},
 							{
-								name: 'Category',
+								name: await resolveKey(message, 'commands:help:group'),
 								value: command.fullCategory[0] as string
 							},
 							{
-								name: 'Aliases',
-								value: command.aliases.join(', ') || 'No aliases.'
+								name: await resolveKey(message, 'commands:help:aliases'),
+								value: command.aliases.join(', ') || (await resolveKey(message, 'commands:help:no_aliases'))
+							},
+							{
+								name: await resolveKey(message, 'commands:help:examples'),
+								value: Array.isArray(examples) ? examples.join(', ') : (examples as string)
 							}
 						]
 					}

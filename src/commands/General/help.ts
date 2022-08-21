@@ -1,11 +1,11 @@
 import { ApplyOptions } from '@sapphire/decorators';
-import { Args } from '@sapphire/framework';
+import type { Args } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import { PaginatedMessage } from '@sapphire/discord.js-utilities';
 import { MessageEmbed } from 'discord.js';
 import { sendLoadingMessage } from '../../lib/utils';
 import { MajoCommand, MajoCommandOptions } from '../../lib/structures/MajoCommand';
-import { MajoClient } from '../../lib/structures/MajoClient';
+import type { MajoClient } from '../../lib/structures/MajoClient';
 import { resolveKey } from '@sapphire/plugin-i18next';
 
 @ApplyOptions<MajoCommandOptions>({
@@ -22,7 +22,9 @@ export class HelpCommand extends MajoCommand {
 				template: new MessageEmbed().setColor('#FF0000').setFooter({ text: ' ©️ Majobot' })
 			});
 			const groups = [...this.container.stores.get('commands').values()].map((cmd) => cmd.category);
+			const options = [];
 			for (const group of [...new Set(groups)]) {
+				if (group === 'Developer' && !this.container.client.config.owners.includes(message.author.id)) continue;
 				const cmds = [...this.container.stores.get('commands').values()].filter((cmd) => cmd.category === group).map((cmd) => cmd.name);
 				paginatedMessage.addPageEmbed(
 					new MessageEmbed()
@@ -30,8 +32,24 @@ export class HelpCommand extends MajoCommand {
 						.setDescription(`${cmds.join(', ')}`)
 						.setTimestamp()
 				);
+				options.push({
+					label: group as string,
+					value: [...new Set(groups)]?.indexOf(group).toString()
+				});
 			}
-
+			paginatedMessage.setActions(
+				[
+					{
+						customId: 'select',
+						options,
+						placeholder: 'select category...',
+						type: 'SELECT_MENU',
+						run: ({ handler, interaction }) =>
+							interaction.isSelectMenu() && (handler.index = parseInt(interaction.values[0] as string, 10))
+					}
+				],
+				false
+			);
 			await paginatedMessage.run(response, message.author);
 			return response;
 		} else {

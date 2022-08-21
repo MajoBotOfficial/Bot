@@ -1,6 +1,6 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import type { Message } from 'discord.js';
-import { Args } from '@sapphire/framework';
+import type { Args } from '@sapphire/framework';
 import settings from '../../../settings.json';
 import { MajoSubCommand, MajoSubCommandOptions } from '../../lib/structures/MajoCommand';
 import { resolveKey } from '@sapphire/plugin-i18next';
@@ -10,7 +10,17 @@ import { resolveKey } from '@sapphire/plugin-i18next';
 	description: 'View prefix or set one',
 	fullCategory: ['Settings'],
 	requiredUserPermissions: ['ADMINISTRATOR'],
-	subCommands: ['set', 'reset', { input: 'show', default: true }],
+	subcommands: [
+		{
+			name: 'set',
+			messageRun: 'set'
+		},
+		{
+			name: 'reset',
+			messageRun: 'reset'
+		},
+		{ name: 'show', messageRun: 'show', default: true }
+	],
 	examples: ['prefix set !', 'prefix reset']
 })
 export class PrefixCommand extends MajoSubCommand {

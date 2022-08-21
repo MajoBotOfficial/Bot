@@ -1,10 +1,11 @@
 import { LogLevel, SapphireClient } from '@sapphire/framework';
 import settings from '../../../settings.json';
 import * as dotenv from 'dotenv';
-import { Message } from 'discord.js';
+import type { Message } from 'discord.js';
 import { GuildDatabaseManager } from '../database/Managers/GuildManager';
 import { InitDatabase } from '../database/Database';
 import MajoConfig, { IConfig } from './MajoConfig';
+import type { DataSource } from 'typeorm';
 
 dotenv.config();
 
@@ -13,6 +14,11 @@ export class MajoClient extends SapphireClient {
 		// We call super our options
 		super({
 			caseInsensitiveCommands: true,
+			api: {
+				listenOptions: {
+					port: 3001
+				}
+			},
 			logger: {
 				level: LogLevel.Info
 			},
@@ -56,7 +62,7 @@ export class MajoClient extends SapphireClient {
 		new MajoConfig(this);
 
 		manager._init(data);
-		this.databases = { guilds: manager };
+		this.databases = { guilds: manager, raw: data };
 		return super.login(process.env.TOKEN);
 	}
 	public override fetchPrefix = async (message: Message): Promise<string[]> => {
@@ -74,6 +80,7 @@ declare module '@sapphire/framework' {
 	interface SapphireClient {
 		databases: {
 			guilds: GuildDatabaseManager;
+			raw: DataSource;
 		};
 		config: IConfig;
 	}

@@ -1,6 +1,6 @@
 import Collection from '@discordjs/collection';
-import { Snowflake } from 'discord.js';
-import { DataSource, Repository } from 'typeorm';
+import type { Snowflake } from 'discord.js';
+import type { DataSource, Repository } from 'typeorm';
 import { GuildEntity } from '../Entities/Guild';
 
 export class GuildDatabaseManager {

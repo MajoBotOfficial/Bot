@@ -5,5 +5,8 @@
     "guild_create": "",
     "guild_delete": "",
     "error_log": ""
+  },
+  "bot": {
+    "color": "#5865F2"
   }
 }

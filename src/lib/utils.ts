@@ -40,16 +40,16 @@ export function untilLength(arr: readonly string[], maxLength = 17, separator = 
 
 export async function replyLocalized(interaction: ChatInputInteraction, options: LocalizedInteractionReplyOptions) {
 	if (interaction.replied || interaction.deferred) {
-		return await interaction.editReply({
+		return (await interaction.editReply({
 			content: container.i18n.format(await fetchLanguage(interaction), options.keys, {
 				replace: options.formatOptions
 			}) as string
-		});
+		})) as Message;
 	}
-	return await interaction.reply({
+	return (await interaction.reply({
 		content: container.i18n.format(await fetchLanguage(interaction), options.keys, {
 			replace: options.formatOptions
 		}) as string,
 		fetchReply: true
-	});
+	})) as Message;
 }

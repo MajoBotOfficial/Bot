@@ -1,4 +1,4 @@
-import { MajoClient } from './MajoClient';
+import type { MajoClient } from './MajoClient';
 import defaultSettings from '../../../settings.example.json';
 
 export interface IConfig {
@@ -8,6 +8,9 @@ export interface IConfig {
 		guild_create: string;
 		guild_delete: string;
 		error_log: string;
+	};
+	bot: {
+		color: string;
 	};
 }
 export default class MajoConfig {

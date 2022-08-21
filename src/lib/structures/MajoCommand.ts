@@ -1,10 +1,10 @@
 import { Command, CommandOptions } from '@sapphire/framework';
-import { SubCommandPluginCommand, SubCommandPluginCommandOptions } from '@sapphire/plugin-subcommands';
+import { Subcommand } from '@sapphire/plugin-subcommands';
 
 export interface MajoCommandOptions extends CommandOptions {
 	examples?: string[];
 }
-export interface MajoSubCommandOptions extends SubCommandPluginCommandOptions {
+export interface MajoSubCommandOptions extends Subcommand.Options {
 	examples?: string[];
 }
 export class MajoCommand extends Command {
@@ -14,9 +14,9 @@ export class MajoCommand extends Command {
 		this.examples = options.examples;
 	}
 }
-export class MajoSubCommand extends SubCommandPluginCommand {
+export class MajoSubCommand extends Subcommand {
 	public examples?: string[] | undefined;
-	constructor(context: SubCommandPluginCommand.Context, options: MajoSubCommandOptions) {
+	constructor(context: Subcommand.Context, options: MajoSubCommandOptions) {
 		super(context, options);
 		this.examples = options.examples || [];
 	}

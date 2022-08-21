@@ -2,7 +2,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import type { Message } from 'discord.js';
 import { MajoCommand, MajoCommandOptions } from '../../lib/structures/MajoCommand';
 import { sendLocalized } from '@sapphire/plugin-i18next';
-import { ChatInputCommand } from '@sapphire/framework';
+import type { ChatInputCommand } from '@sapphire/framework';
 import { replyLocalized } from '../../lib/utils';
 
 @ApplyOptions<MajoCommandOptions>({
